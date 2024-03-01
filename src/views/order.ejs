@@ -1,0 +1,110 @@
+<!-- views/your_ejs_file.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <!-- Add your CSS styles here -->
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        padding: 50px;
+        font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+      }
+
+      a {
+        color: #00b7ff;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h3>Tao moi don hang</h3>
+    <div class="table-responsive">
+      <form id="createOrder" action="create_payment_url" method="POST">
+        <div class="form-group">
+          <label for="amount">Số tiền</label>
+          <input
+            type="text"
+            class="form-control"
+            id="amount"
+            name="amount"
+            placeholder="Số tiền"
+            value="1000000"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Chọn Phương thức thanh toán:</label>
+          <label class="control-label"></label>
+          <div class="controls">
+            <label class="radio-inline">
+              <input
+                type="radio"
+                name="bankCode"
+                id="defaultPaymentMethod"
+                value=""
+                checked="true"
+              />
+              Cổng thanh toán VNPAYQR
+            </label>
+            <label class="radio-inline">
+              <input
+                type="radio"
+                name="bankCode"
+                id="vnpayqrPaymentMethod"
+                value="VNPAYQR"
+              />
+              Thanh toán qua ứng dụng hỗ trợ VNPAYQR
+            </label>
+            <label class="radio-inline">
+              <input
+                type="radio"
+                name="bankCode"
+                id="vnbankPaymentMethod"
+                value="VNBANK"
+              />
+              Thanh toán qua ATM-Tài khoản ngân hàng nội địa
+            </label>
+            <label class="radio-inline">
+              <input
+                type="radio"
+                name="bankCode"
+                id="intcardPaymentMethod"
+                value="INTCARD"
+              />
+              Thanh toán qua thẻ quốc tế
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="language">Ngôn ngữ</label>
+          <label class="control-label"></label>
+          <div class="controls">
+            <label class="radio-inline">
+              <input
+                type="radio"
+                name="language"
+                id="vnLanguage"
+                value="vn"
+                checked="true"
+              />
+              Tiếng việt
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="language" id="enLanguage" value="en" />
+              Tiếng anh
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-default" id="btnPopup">
+          Thanh toán
+        </button>
+      </form>
+    </div>
+    <p>&nbsp;</p>
+  </body>
+</html>
