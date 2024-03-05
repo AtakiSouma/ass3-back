@@ -205,16 +205,15 @@ const userController = {
       }
     }
   },
-  getAllUsersCustomer: async (req: Request, res: Response, next: NextFunction) => {
+  getAllUsersCustomer: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { search, limit, page } = req.body;
-      const users = await userServices.getAlluserCustomers(
-        search,
-        page,
-        limit
-      );
-      if (users)
-        return sendSuccessResponse(res, HttpStatusCodes.OK, users);
+      const users = await userServices.getAlluserCustomers(search, page, limit);
+      if (users) return sendSuccessResponse(res, HttpStatusCodes.OK, users);
     } catch (error) {
       if (error instanceof CustomError) {
         next(error);
@@ -224,8 +223,31 @@ const userController = {
         next(error);
       }
     }
- 
-  }
+  },
+  changePassword: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { uid, current_password, new_password, confirm_password } =
+        req.body;
+        if(!uid || !current_password || !new_password || !confirm_password){
+          throw generateError("Invalid Input" ,HttpStatusCodes.NOT_FOUND)
+        }
+      const users = await userServices.ChangePassword({
+        current_password,
+        uid,
+        new_password,
+        confirm_password,
+      });
+      if (users) return sendSuccessResponse(res, HttpStatusCodes.OK, users);
+    } catch (error) {
+      if (error instanceof CustomError) {
+        next(error);
+      } else if (error instanceof Error) {
+        next(error.message);
+      } else {
+        next(error);
+      }
+    }
+  },
 };
 
 export default userController;

@@ -17,8 +17,42 @@ import HttpStatusCodes from "../constants/HttpStatusCodes";
 import bcryptModule from "../util/bcryptModule";
 import { UUID } from "mongodb";
 import emailServices from "./email.services";
+export interface updatePassword {
+  uid:string;
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}
 
 class userServices {
+  public async ChangePassword({
+    uid,
+    current_password,
+    new_password,
+    confirm_password,
+  }: updatePassword) {
+    const existUser = await Users.findById(uid);
+    if (!existUser) {
+      throw generateError("User not found", HttpStatusCodes.NOT_FOUND);
+    }
+    const compare = await bcryptModule.compare(
+      current_password,
+      existUser.password
+    );
+    if (compare) {
+      if (new_password === confirm_password) {
+        const pwd = await bcryptModule.getHash(new_password);
+       existUser.password = pwd || current_password;
+       await existUser.save();
+       return existUser;
+      }else{
+        throw generateError("Password not matching", HttpStatusCodes.CONFLICT);
+
+      }
+    } else {
+      throw generateError("Wrong current password", HttpStatusCodes.CONFLICT);
+    }
+  }
   public async registerUser({
     username,
     email,
@@ -47,7 +81,8 @@ class userServices {
       email: email,
       password: pwd,
       username: username,
-      avatar: "https://static.wikia.nocookie.net/houkai-star-rail/images/9/9c/Ruan_Mei_Sticker_04.png/revision/latest/scale-to-width-down/250?cb=20231220232420",
+      avatar:
+        "https://i.pinimg.com/236x/f2/2b/f8/f22bf81d5d7b42a3bb83a9ab020242df.jpg",
       phoneNumber: null,
     });
     return new_user;
@@ -94,7 +129,7 @@ class userServices {
     return updatedUser;
   }
 
-  public async changeRoles({ uid}: IChangeRoles) {
+  public async changeRoles({ uid }: IChangeRoles) {
     const userExisting = await Users.findById({
       _id: uid,
     });
@@ -146,7 +181,7 @@ class userServices {
   public async blockUser({ uid }: IUidParams) {
     const userExisting = await Users.findById({ _id: uid });
     if (userExisting) {
-      userExisting.isBlocked = true;
+      userExisting.isBlocked = !userExisting.isBlocked;
       await userExisting.save();
       return userExisting;
     } else {
@@ -164,11 +199,15 @@ class userServices {
     }
   }
 
-  public async getAlluserCustomers(search: string, page: number, limit: number) {
+  public async getAlluserCustomers(
+    search: string,
+    page: number,
+    limit: number
+  ) {
     try {
       const query = {
         username: { $regex: new RegExp(search, "i") },
-        isAdmin:false,
+        isAdmin: false,
       };
       const userLists = await Users.find(query)
         .sort({ create_at: "desc" })
@@ -178,10 +217,12 @@ class userServices {
       const data = userLists.map((user) => ({
         id: user._id,
         username: user.username,
-        email:user.email,
-        avatar : user.avatar,
+        email: user.email,
+        avatar: user.avatar,
         phoneNumber: user.phoneNumber,
-        gender: user.gender
+        gender: user.gender,
+        isBlocked: user.isBlocked,
+        status: user.status,
       }));
       const response = {
         data,
@@ -194,7 +235,6 @@ class userServices {
       throw generateError("Cannot get user!", HttpStatusCodes.BAD_REQUEST);
     }
   }
-
 }
 
 export default new userServices();

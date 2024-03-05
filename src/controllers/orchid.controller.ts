@@ -152,6 +152,9 @@ const OrchidsController = {
   ) => {
     try {
       const { slug } = req.params;
+      if(!slug){
+        throw generateError("Invalid" , HttpStatusCodes.NOT_FOUND)
+      }
       const response= await orchidServices.DeleteOneOrchidsBySlug({
         slug,
       });

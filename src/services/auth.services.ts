@@ -14,6 +14,7 @@ export interface tokenGenerate {
   email?: string;
   isAdmin: boolean;
   username: string;
+  avatar:string;
 }
 class AuthService {
   private generateResponse(
@@ -133,7 +134,8 @@ class AuthService {
       id: user.id,
       email: user.email,
       isAdmin: user.isAdmin,
-      username:user.username
+      username:user.username,
+      avatar: user.avatar
     };
     const { accessToken, refreshToken } =
       jwtServices.generatePairToken(tokenGenerate);
@@ -149,10 +151,10 @@ class AuthService {
     );
     let link = "";
     if (user.isAdmin === true) {
-      link = "/dashboard";
+      link = "/orchid";
     }
     if (user.isAdmin === false) {
-      link = "/";
+      link = "/dashboard";
     }
     this.setRefreshTokenInDB(user.id, refreshToken);
 
@@ -169,14 +171,18 @@ class AuthService {
     if (!user || !user.password) {
       throw generateError("User not found", HttpStatusCodes.UNAUTHORIZED);
     }
+    if(user.isBlocked === true){
+      throw generateError("User is Blocked", HttpStatusCodes.NOT_ACCEPTABLE);
 
+    }
     const compare = await bcryptModule.compare(password, user.password);
     if (compare) {
       const tokenGenerate: tokenGenerate = {
         id: user.id,
         email: user.email,
         isAdmin: user.isAdmin,
-        username:user.username
+        username:user.username,
+        avatar:user.avatar
       };
 
       const { accessToken, refreshToken } =
@@ -193,10 +199,10 @@ class AuthService {
       );
       let link = "";
       if (user.isAdmin === true) {
-        link = "/dashboard";
+        link = "/orchid";
       }
       if (user.isAdmin === false) {
-        link = "/";
+        link = "/dashboard";
       }
 
       this.setRefreshTokenInDB(user.id, refreshToken);
